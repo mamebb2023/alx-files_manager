@@ -1,30 +1,37 @@
-import redis from 'redis';
-import { promisify } from 'util';
+import { MongoClient } from 'mongodb';
 
-class RedisClient {
+const host = process.env.DB_HOST || 'localhost';
+const port = process.env.DB_PORT || 27017;
+const database = process.env.DB_DATABASE || 'files_manager';
+const url = `mongodb://${host}:${port}/`;
+const options = {
+  useUnifiedTopology: true,
+}
+
+class DBClient {
   constructor() {
-    this.client = redis.createClient();
-    this.getAsync = promisify(this.client.get).bind(this.client);
-    this.client.on('error', (err) => console.log(`Redis client not connected to the server: ${err}`));
+    this.db = null;
+    MongoClient.connect(url, options, (err, client) => {
+      if (err) console.log(err);
+      this.db = client.db(database);
+      this.db.createCollection('users');
+      this.db.createCollection('files');
+    });
   }
 
   isAlive() {
-    return this.client.connected;
+    return !!this.db;
   }
 
-  async get(key) {
-    return this.getAsync(key);
+  async nbUsers() {
+    return this.db.collection('users').countDocumnets();
   }
 
-  async set(key, value, time) {
-    this.client.setex(key, time, value);
-  }
-
-  async del(key) {
-    this.client.del(key);
+  async nbFiles() {
+    return this.db.collection('files').countDocumnets();
   }
 }
 
-const redisClient = new RedisClient();
+const dbClient = new DBClient();
 
-module.exports = redisClient;
+module.exports = dbClient;
