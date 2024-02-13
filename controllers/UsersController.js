@@ -1,5 +1,4 @@
 import sha1 from 'sha1';
-import { response } from 'express';
 import dbClient from '../utils/db';
 
 class UsersController {
@@ -13,11 +12,11 @@ class UsersController {
     try {
       const userCollection = dbClient.db.collection('users');
       if (await userCollection.findOne({ email })) {
-        response.status(400).json({ error: 'Already exist' });
+        res.status(400).json({ error: 'Already exist' });
       } else {
         userCollection.insertOne({ email, password: hashPwd });
         const newUser = await userCollection.findOne({ email }, { projection: { email: 1 } });
-        response.status(201).json({ id: newUser._id, email: newUser.email });
+        res.status(201).json({ id: newUser._id, email: newUser.email });
       }
     } catch (err) {
       console.log(err);
