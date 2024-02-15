@@ -8,7 +8,7 @@ class UsersController {
     if (!password) return res.status(400).json({ error: 'Missing password' });
 
     if (await dbClient.userCollection.findOne({ email })) {
-      return res.status(400).json({ error: 'Already exist' })
+      return res.status(400).json({ error: 'Already exist' });
     }
 
     // Strong password encryption here
@@ -20,7 +20,7 @@ class UsersController {
     } catch (err) {
       return res.status(500).json({ error: 'Server Error' });
     }
-    const newUser = { id: result.insertedId, email, };
+    const newUser = { id: result.insertedId, email };
     return res.status(201).json(newUser);
   }
 }
