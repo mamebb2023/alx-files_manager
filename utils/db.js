@@ -10,9 +10,12 @@ const options = {
 
 class DBClient {
   constructor() {
-    this.db = null;
     MongoClient.connect(url, options, (err, client) => {
-      if (err) console.log(err);
+      if (err)
+      {
+        console.log(err.message);
+        this.db = false;
+      }
       this.db = client.db(database);
       this.db.createCollection('users');
       this.db.createCollection('files');
@@ -20,18 +23,11 @@ class DBClient {
   }
 
   isAlive() {
-    return !!this.db;
+    return Boolean(this.db);
   }
 
   async nbUsers() {
     return this.db.collection('users').countDocuments();
-  }
-
-  async getUser(query) {
-    console.log('QUERY IN DB.JS', query);
-    const user = await this.db.collection('users').findOne(query);
-    console.log('GET USER IN DB.JS', user);
-    return user;
   }
 
   async nbFiles() {
