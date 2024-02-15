@@ -14,14 +14,13 @@ class UsersController {
     // Strong password encryption here
     const hashPwd = sha1(password);
 
-    let result;
     try {
-      result = await dbClient.userCollection.insertOne({ email, password: hashPwd });
+      await dbClient.userCollection.insertOne({ email, password: hashPwd });
     } catch (err) {
       return res.status(500).json({ error: 'Server Error' });
     }
-    const newUser = { id: result.insertedId, email };
-    return res.status(201).json(newUser);
+    const user = dbClient.userCollection.findOne({ email });
+    return res.status(201).json({ id: user._id, email });
   }
 }
 
