@@ -4,25 +4,24 @@ import dbClient from '../utils/db';
 class UsersController {
   static async postNew(req, res) {
     const { email, password } = req.body;
-    if (!email) res.status(400).json({ error: 'Missing email' });
-    if (!password) res.status(400).json({ error: 'Missing password' });
+    if (!email) return res.status(400).send({ error: 'Missing email' });
+    if (!password) return res.status(400).send({ error: 'Missing password' });
+
+    if (await dbClient.userCollection.findOne({ email })) {
+      return res.status(400).send({ error: 'Already exist' })
+    }
 
     // Strong password encryption here
     const hashPwd = sha1(password);
 
+    let result;
     try {
-      const userCollection = dbClient.db.collection('users');
-      if (await userCollection.findOne({ email })) {
-        res.status(400).json({ error: 'Already exist' });
-      } else {
-        userCollection.insertOne({ email, password: hashPwd });
-        const newUser = await userCollection.findOne({ email }, { projection: { email: 1 } });
-        res.status(201).json({ id: newUser._id, email: newUser.email });
-      }
+      result = await dbClient.userCollection.insertOne({ email, password: hashPwd });
     } catch (err) {
-      console.log(err);
-      res.send(500).json({ error: 'Server error' });
+      return res.status(500).send({ error: 'Server Error' });
     }
+    const newUser = { id: result.insertedId, email, };
+    return res.status(201).send(newUser);
   }
 }
 
