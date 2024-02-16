@@ -1,5 +1,8 @@
 import sha1 from 'sha1';
+import { ObjectId } from 'mongodb';
+
 import dbClient from '../utils/db';
+import userUtils from '../utils/user';
 
 class UsersController {
   static async postNew(req, res) {
@@ -21,6 +24,18 @@ class UsersController {
     }
     const user = dbClient.userCollection.findOne({ email });
     return res.status(201).json({ id: user.insertedId, email });
+  }
+
+  static async getMe(req, res) {
+    const userID = await userUtils.getUserIdAndKey(req);
+    const user = await userUtils.getUser({ _id: ObjectId(userID) });
+    if (!user) return res.status(401).send({ error: 'Unauthorized' });
+
+    const processedUser = { id: user._id, ...user };
+    delete processedUser._id;
+    delete processedUser.password;
+
+    return res.status(200).send(processedUser);
   }
 }
 
