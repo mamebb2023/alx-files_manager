@@ -14,7 +14,7 @@ class AppController {
     const stats = {
       users: dbClient.nbUsers(),
       files: dbClient.nbFiles(),
-    }
+    };
     res.status(200).send(stats);
   }
 }
