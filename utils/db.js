@@ -11,8 +11,7 @@ const options = {
 class DBClient {
   constructor() {
     MongoClient.connect(url, options, (err, client) => {
-      if (err)
-      {
+      if (err) {
         console.log(err.message);
         this.db = false;
       }
