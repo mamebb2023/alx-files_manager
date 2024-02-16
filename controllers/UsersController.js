@@ -20,7 +20,7 @@ class UsersController {
       return res.status(500).json({ error: 'Server Error' });
     }
     const user = dbClient.userCollection.findOne({ email });
-    return res.status(201).json({ id: user._id, email });
+    return res.status(201).json({ id: user.insertedId, email });
   }
 }
 
