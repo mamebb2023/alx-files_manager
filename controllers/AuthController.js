@@ -13,7 +13,9 @@ class AuthController {
     const [email, pwd] = credentials.split(':');
     if (!email || !pwd) return res.status(401).send({ error: 'Unauthorized' });
 
+    // Password encryption
     const hashPwd = sha1(pwd);
+
     const user = await userUtils.getUser({ email, password: hashPwd });
     if (!user) return res.status(401).send({ error: 'Unauthorized' });
 
