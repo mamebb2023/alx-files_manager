@@ -12,11 +12,6 @@ class userUtils {
 
     return obj;
   }
-
-  static async getUser(query) {
-    const user = await dbClient.userCollection.findOne(query);
-    return user;
-  }
 }
 
 export default userUtils;
