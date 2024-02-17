@@ -15,7 +15,7 @@ class DBClient {
         console.log(err.message);
         this.db = false;
       }
-      
+
       this.db = client.db(database);
       this.userCollection = this.db.collection('users');
       this.filesCollection = this.db.collection('files');
