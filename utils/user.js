@@ -2,7 +2,7 @@ import redisClient from './redis';
 import dbClient from './db';
 
 class userUtils {
-  async getUserIdAndKey(req) {
+  static async getUserIdAndKey(req) {
     const obj = { userId: null, key: null };
     const xToken = req.header('X-Token');
     if (!xToken) return obj;
@@ -13,8 +13,8 @@ class userUtils {
     return obj;
   }
 
-  async getUser(query) {
-    const user = await dbClient.usersCollection.findOne(query);
+  static async getUser(query) {
+    const user = await dbClient.userCollection.findOne(query);
     return user;
   }
 }
