@@ -10,8 +10,8 @@ class UsersController {
     if (!email) return res.status(400).json({ error: 'Missing email' });
     if (!password) return res.status(400).json({ error: 'Missing password' });
 
-    const foundEmail = await dbClient.userCollection.findOne({ email });
-    if (foundEmail) {
+    const emailExists = await dbClient.userCollection.findOne({ email });
+    if (emailExists) {
       return res.status(400).json({ error: 'Already exist' });
     }
 
@@ -21,22 +21,35 @@ class UsersController {
     try {
       await dbClient.userCollection.insertOne({ email, password: hashPwd });
     } catch (err) {
-      return res.status(500).json({ error: 'Server Error' });
+      return res.status(500).send({ error: 'Server Error' });
     }
     const user = dbClient.userCollection.findOne({ email });
-    return res.status(201).json({ id: user.insertedId, email });
+    return res.status(201).send({ id: user.insertedId, email });
   }
 
   static async getMe(req, res) {
-    const userID = await userUtils.getUserIdAndKey(req);
-    const user = await userUtils.getUser({ _id: ObjectId(userID) });
-    if (!user) return res.status(401).send({ error: 'Unauthorized' });
+    try {
+      const { userId } = await userUtils.getUserIdAndKey(req);
+  
+      // Validate userId format before conversion
+      if (!ObjectId.isValid(userId)) {
+        return res.status(400).send({ error: 'Invalid user ID format' });
+      }
 
-    const processedUser = { id: user._id, ...user };
-    delete processedUser._id;
-    delete processedUser.password;
-
-    return res.status(200).send(processedUser);
+      const userObjId = ObjectId(userId);
+      const user = await dbClient.userCollection.findOne({ _id: userObjId }, { projection: { password: 0 } });
+  
+      if (!user) return res.status(401).send({ error: 'Unauthorized' });
+  
+      const sanitizedUser = { ...user, id: user._id };
+      delete sanitizedUser._id;
+  
+      return res.status(200).send(sanitizedUser);
+  
+    } catch (error) {
+      console.error('Error getting user data:', error);
+      return res.status(500).send({ error: 'Internal server error' });
+    }
   }
 }
 
