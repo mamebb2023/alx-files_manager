@@ -15,9 +15,10 @@ class DBClient {
         console.log(err.message);
         this.db = false;
       }
+      
       this.db = client.db(database);
-      this.db.createCollection('users');
-      this.db.createCollection('files');
+      this.userCollection = this.db.collection('users');
+      this.filesCollection = this.db.collection('files');
     });
   }
 
