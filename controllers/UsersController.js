@@ -10,7 +10,8 @@ class UsersController {
     if (!email) return res.status(400).json({ error: 'Missing email' });
     if (!password) return res.status(400).json({ error: 'Missing password' });
 
-    if (await dbClient.userCollection.findOne({ email })) {
+    const foundEmail =  await dbClient.userCollection.findOne({ email });
+    if (foundEmail) {
       return res.status(400).json({ error: 'Already exist' });
     }
 
