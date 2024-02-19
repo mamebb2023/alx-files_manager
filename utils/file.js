@@ -60,7 +60,7 @@ class fileUtils {
     } = fileParams;
     let { parentId } = fileParams;
 
-    if (parentId !== 0) parentId = ObjectId(parentId);
+    if (parentId !== '0') parentId = ObjectId(parentId);
 
     const userObjId = ObjectId(userId);
     const query = {
