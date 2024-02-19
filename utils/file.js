@@ -11,24 +11,22 @@ class fileUtils {
       name, type, isPublic = false, data,
     } = req.body;
     let { parentId = 0 } = req.body;
+    if ( parentId === '0') parentId = 0;
 
     const acceptedTypes = ['file', 'image', 'folder'];
     let msg = null;
 
-    if (parentId === '0') parentId = 0;
-
     if (!name) {
-      msg = 'Missing Name';
+      msg = 'Missing name';
     } else if (!type || !acceptedTypes.includes(type)) {
       msg = 'Missing type';
     } else if (!data && type !== 'folder') {
       msg = 'Missing data';
     } else if (parentId && parentId !== '0') {
-      let file;
 
+      let file;
       if (userUtils.isValidId(parentId)) {
-        const fileObjId = ObjectId(parentId);
-        file = await this.getFile({ _id: fileObjId });
+        file = await this.getFile({ _id: ObjectId(parentId) });
       } else {
         file = null;
       }
@@ -63,7 +61,7 @@ class fileUtils {
     } = fileParams;
     let { parentId } = fileParams;
 
-    if (parentId !== '0') parentId = ObjectId(parentId);
+    if (parentId !== 0) parentId = ObjectId(parentId);
 
     const userObjId = ObjectId(userId);
     const query = {
