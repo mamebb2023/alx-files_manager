@@ -30,23 +30,22 @@ class UsersController {
   static async getMe(req, res) {
     try {
       const { userId } = await userUtils.getUserIdAndKey(req);
-  
+
       // Validate userId format before conversion
       if (!ObjectId.isValid(userId)) {
         return res.status(401).send({ error: 'Unauthorized' });
       }
 
       const userObjId = ObjectId(userId);
-      const user = await userUtils.getUser({ _id: userObjId }, { projection: { password: false }});
+      const user = await userUtils.getUser({ _id: userObjId }, { projection: { password: false } });
       console.log(user);
-  
+
       if (!user) return res.status(401).send({ error: 'Unauthorized' });
-  
+
       const sanitizedUser = { id: user._id, ...user };
       delete sanitizedUser._id;
-  
+
       return res.status(200).send(sanitizedUser);
-  
     } catch (error) {
       console.error('Error getting user data:', error);
       return res.status(500).send({ error: 'Internal server error' });
