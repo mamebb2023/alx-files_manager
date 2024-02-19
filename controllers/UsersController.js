@@ -23,7 +23,7 @@ class UsersController {
     } catch (err) {
       return res.status(500).send({ error: 'Server Error' });
     }
-    const user = await userUtils.getUser({ email });
+    const user = await userUtils.getUser({ email }, { projection: { password: false } });
     return res.status(201).send({ id: user._id, email });
   }
 
