@@ -30,8 +30,7 @@ class UsersController {
   static async getMe(req, res) {
     try {
       const { userId } = await userUtils.getUserIdAndKey(req);
-      console.log (userId);
-      // Validate userId format before conversion
+
       if (!ObjectId.isValid(userId)) {
         return res.status(401).send({ error: 'Unauthorized' });
       }
