@@ -31,7 +31,7 @@ class UsersController {
     try {
       const { userId } = await userUtils.getUserIdAndKey(req);
 
-      if (!ObjectId.isValid(userId)) {
+      if (!userUtils.isValidId(userId)) {
         return res.status(401).send({ error: 'Unauthorized' });
       }
 
