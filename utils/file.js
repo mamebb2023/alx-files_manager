@@ -11,7 +11,7 @@ class fileUtils {
       name, type, isPublic = false, data,
     } = req.body;
     let { parentId = 0 } = req.body;
-    if ( parentId === '0') parentId = 0;
+    if (parentId === '0') parentId = 0;
 
     const acceptedTypes = ['file', 'image', 'folder'];
     let msg = null;
@@ -23,7 +23,6 @@ class fileUtils {
     } else if (!data && type !== 'folder') {
       msg = 'Missing data';
     } else if (parentId && parentId !== '0') {
-
       let file;
       if (userUtils.isValidId(parentId)) {
         file = await this.getFile({ _id: ObjectId(parentId) });
