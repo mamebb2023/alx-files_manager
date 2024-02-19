@@ -10,7 +10,12 @@ class AuthController {
     if (!creds) return res.status(401).send({ error: 'Unauthorized' });
 
     const credentials = Buffer.from(creds, 'base64').toString('utf-8');
-    const [email, pwd] = credentials.split(':');
+    const parts = credentials.split(':');
+    if (parts.length !== 2) {
+      return res.status(401).send({ error: 'Unauthorized' });
+    }
+
+    const [email, pwd] = parts;
     if (!email || !pwd) return res.status(401).send({ error: 'Unauthorized' });
 
     // Password encryption
@@ -29,7 +34,9 @@ class AuthController {
   }
 
   static async getDisconnect(req, res) {
-    const [userId, userKey] = userUtils.getUserIdAndKey(req);
+    const user = await userUtils.getUserIdAndKey(req);
+    const userId = user.id;
+    const userKey = user.key;
     if (!userId) return res.status(401).send({ error: 'Unauthorized' });
 
     await redisClient.del(userKey);
