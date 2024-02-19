@@ -10,7 +10,7 @@ class UsersController {
     if (!email) return res.status(400).json({ error: 'Missing email' });
     if (!password) return res.status(400).json({ error: 'Missing password' });
 
-    const emailExists = await dbClient.userCollection.findOne({ email });
+    const emailExists = await userUtils.getUser({ email });
     if (emailExists) {
       return res.status(400).json({ error: 'Already exist' });
     }
@@ -23,8 +23,8 @@ class UsersController {
     } catch (err) {
       return res.status(500).send({ error: 'Server Error' });
     }
-    const user = userUtils.getUser({ email });
-    return res.status(201).send({ id: user.insertedId, email });
+    const user = await userUtils.getUser({ email });
+    return res.status(201).send({ id: user._id, email });
   }
 
   static async getMe(req, res) {
