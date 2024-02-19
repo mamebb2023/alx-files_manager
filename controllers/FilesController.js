@@ -18,7 +18,7 @@ class FilesController {
     const { error: validationError, fileParams } = await fileUtils.validateBody(req);
     if (validationError) return res.status(400).send({ error: validationError });
 
-    if (fileParams.parentId !== '0' && !userUtils.isValidId(fileParams.parentId)) {
+    if (fileParams.parentId !== 0 && !userUtils.isValidId(fileParams.parentId)) {
       return res.status(400).send({ error: 'Parent not found' });
     }
 
