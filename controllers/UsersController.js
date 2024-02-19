@@ -30,7 +30,7 @@ class UsersController {
   static async getMe(req, res) {
     try {
       const { userId } = await userUtils.getUserIdAndKey(req);
-
+      console.log (userId);
       // Validate userId format before conversion
       if (!ObjectId.isValid(userId)) {
         return res.status(401).send({ error: 'Unauthorized' });
@@ -38,8 +38,6 @@ class UsersController {
 
       const userObjId = ObjectId(userId);
       const user = await userUtils.getUser({ _id: userObjId }, { projection: { password: false } });
-      console.log(user);
-
       if (!user) return res.status(401).send({ error: 'Unauthorized' });
 
       const sanitizedUser = { id: user._id, ...user };
@@ -48,7 +46,7 @@ class UsersController {
       return res.status(200).send(sanitizedUser);
     } catch (error) {
       console.error('Error getting user data:', error);
-      return res.status(500).send({ error: 'Internal server error' });
+      return res.status(500).send({ error: 'Server error' });
     }
   }
 }
