@@ -23,7 +23,7 @@ class UsersController {
     } catch (err) {
       return res.status(500).send({ error: 'Server Error' });
     }
-    const user = dbClient.userCollection.findOne({ email });
+    const user = userUtils.getUser({ email });
     return res.status(201).send({ id: user.insertedId, email });
   }
 
@@ -33,15 +33,16 @@ class UsersController {
   
       // Validate userId format before conversion
       if (!ObjectId.isValid(userId)) {
-        return res.status(400).send({ error: 'Invalid user ID format' });
+        return res.status(401).send({ error: 'Unauthorized' });
       }
 
       const userObjId = ObjectId(userId);
-      const user = await dbClient.userCollection.findOne({ _id: userObjId }, { projection: { password: 0 } });
+      const user = await userUtils.getUser({ _id: userObjId }, { projection: { password: false }});
+      console.log(user);
   
       if (!user) return res.status(401).send({ error: 'Unauthorized' });
   
-      const sanitizedUser = { ...user, id: user._id };
+      const sanitizedUser = { id: user._id, ...user };
       delete sanitizedUser._id;
   
       return res.status(200).send(sanitizedUser);
