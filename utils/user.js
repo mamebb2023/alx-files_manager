@@ -3,14 +3,13 @@ import dbClient from './db';
 
 class userUtils {
   static async getUserIdAndKey(req) {
-    const obj = { id: null, key: null };
     const xToken = req.header('X-Token');
-    if (!xToken) return obj;
+    if (!xToken) return;
 
-    obj.key = `auth_${xToken}`;
-    obj.id = await redisClient.get(obj.key);
+    const userKey = `auth_${xToken}`;
+    const userId = await redisClient.get(userKey);
 
-    return obj;
+    return { userKey, userId };
   }
 
   static async getUser(...query) {
