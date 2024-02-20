@@ -22,7 +22,7 @@ class fileUtils {
       msg = 'Missing type';
     } else if (!data && type !== 'folder') {
       msg = 'Missing data';
-    } else if (parentId && parentId !== '0') {
+    } else if (parentId && parentId !== 0) {
       let file;
       if (userUtils.isValidId(parentId)) {
         file = await this.getFile({ _id: ObjectId(parentId) });
