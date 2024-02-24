@@ -153,7 +153,7 @@ class FilesController {
     const size = request.query.size || 0;
 
     // Mongo Condition for Id
-    if (!basicUtils.isValidId(fileId)) { return response.status(404).send({ error: 'Not found' }); }
+    if (!userUtils.isValidId(fileId)) { return response.status(404).send({ error: 'Not found' }); }
 
     const fileObjId = ObjectId(fileId);
     const file = await fileUtils.getFile({
