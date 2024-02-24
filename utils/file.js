@@ -120,7 +120,7 @@ class fileUtils {
     return file;
   }
 
-  async publishUnpublish(request, setPublish) {
+  static async publishUnpublish(request, setPublish) {
     const { id: fileId } = request.params;
 
     if (!userUtils.isValidId(fileId)) { return { error: 'Unauthorized', code: 401 }; }
