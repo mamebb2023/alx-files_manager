@@ -189,7 +189,7 @@ class fileUtils {
     if (size) localPath = `${localPath}_${size}`;
 
     try {
-      data = await fsPromises.readFile(localPath);
+      data = await promises.readFile(localPath);
     } catch (err) {
       // console.log(err.message);
       return { error: 'Not found', code: 404 };
