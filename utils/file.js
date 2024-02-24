@@ -54,6 +54,20 @@ class fileUtils {
     return file;
   }
 
+  static async getFilesOfParentId(query) {
+    const fileList = await dbClient.filesCollection.aggregate(query);
+    return fileList;
+  }
+
+  static async updateFile(query, set) {
+    const fileList = await dbClient.filesCollection.findOneAndUpdate(
+      query,
+      set,
+      { returnOriginal: false },
+    );
+    return fileList;
+  }
+
   static async saveFile(userId, fileParams, FOLDER_PATH) {
     const {
       name, type, isPublic, data,
@@ -93,6 +107,95 @@ class fileUtils {
     delete sanitizedFile._id;
 
     return { error: null, sanitizedFile };
+  }
+
+  static processFile(doc) {
+    // Changes _id for id and removes localPath
+
+    const file = { id: doc._id, ...doc };
+
+    delete file.localPath;
+    delete file._id;
+
+    return file;
+  }
+
+  async publishUnpublish(request, setPublish) {
+    const { id: fileId } = request.params;
+
+    if (!userUtils.isValidId(fileId)) { return { error: 'Unauthorized', code: 401 }; }
+
+    const { userId } = await userUtils.getUserIdAndKey(request);
+
+    if (!userUtils.isValidId(userId)) { return { error: 'Unauthorized', code: 401 }; }
+
+    const userObjId = ObjectId(userId);
+    const user = await userUtils.getUser({
+      _id: userObjId,
+    });
+
+    if (!user) return { error: 'Unauthorized', code: 401 };
+
+    const fileObjId = ObjectId(fileId);
+    const file = await this.getFile({
+      _id: fileObjId,
+      userId: userObjId,
+    });
+
+    if (!file) return { error: 'Not found', code: 404 };
+
+    const result = await this.updateFile(
+      {
+        _id: fileObjId,
+        userId: userObjId,
+      },
+      { $set: { isPublic: setPublish } },
+    );
+
+    const {
+      _id: id,
+      userId: resultUserId,
+      name,
+      type,
+      isPublic,
+      parentId,
+    } = result.value;
+
+    const updatedFile = {
+      id,
+      userId: resultUserId,
+      name,
+      type,
+      isPublic,
+      parentId,
+    };
+
+    return { error: null, code: 200, updatedFile };
+  }
+
+  static isOwnerAndPublic(file, userId) {
+    if (
+      (!file.isPublic && !userId)
+      || (userId && file.userId.toString() !== userId && !file.isPublic)
+    ) { return false; }
+
+    return true;
+  }
+
+  static async getFileData(file, size) {
+    let { localPath } = file;
+    let data;
+
+    if (size) localPath = `${localPath}_${size}`;
+
+    try {
+      data = await fsPromises.readFile(localPath);
+    } catch (err) {
+      // console.log(err.message);
+      return { error: 'Not found', code: 404 };
+    }
+
+    return { data };
   }
 }
 
