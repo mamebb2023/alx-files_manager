@@ -1,10 +1,13 @@
 import { ObjectId } from 'mongodb';
 import mime from 'mime-types';
+import Queue from 'bull';
 
 import userUtils from '../utils/user';
 import fileUtils from '../utils/file';
 
 const FOLDER_PATH = process.env.FOLDER_PATH || '/tmp/files_manager';
+
+const fileQueue = new Queue('fileQueue');
 
 class FilesController {
   static async postUpload(req, res) {
@@ -29,7 +32,17 @@ class FilesController {
       FOLDER_PATH,
     );
 
-    if (error) return res.status(code).send(error);
+    if (error) {
+      if (res.body.type === 'image') await fileQueue.add({ userId });
+      return res.status(code).send(error);
+    }
+
+    if (fileParams.type === 'image') {
+      await fileQueue.add({
+        fileId: newFile.id.toString(),
+        userId: newFile.userId.toString(),
+      });
+    }
 
     return res.status(201).send(sanitizedFile);
   }
