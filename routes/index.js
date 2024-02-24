@@ -23,6 +23,8 @@ const routerController = (app) => {
 
   // File Controller
   router.post('/files', (req, res) => FilesController.postUpload(req, res));
+  router.get('/files', (req, res) => FilesController.getIndex(req, res));
+  router.get('/files/:id', (req, res) => FilesController.getShow(req, res));
 };
 
 export default routerController;
