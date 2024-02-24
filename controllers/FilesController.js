@@ -39,8 +39,8 @@ class FilesController {
 
     if (fileParams.type === 'image') {
       await fileQueue.add({
-        fileId: newFile.id.toString(),
-        userId: newFile.userId.toString(),
+        fileId: sanitizedFile.id.toString(),
+        userId: sanitizedFile.userId.toString(),
       });
     }
 
