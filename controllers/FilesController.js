@@ -110,6 +110,28 @@ class FilesController {
 
     return response.status(200).send(fileList);
   }
+
+  static async putPublish(request, response) {
+    const { error, code, updatedFile } = await fileUtils.publishUnpublish(
+      request,
+      true,
+    );
+
+    if (error) return response.status(code).send({ error });
+
+    return response.status(code).send(updatedFile);
+  }
+
+  static async putUnpublish(request, response) {
+    const { error, code, updatedFile } = await fileUtils.publishUnpublish(
+      request,
+      false,
+    );
+
+    if (error) return response.status(code).send({ error });
+
+    return response.status(code).send(updatedFile);
+  }
 }
 
 export default FilesController;
